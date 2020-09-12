@@ -13,3 +13,9 @@
 Если нажать на кнопку "YES", то откроется окно с сообщением:
 
 ![](./Screenshots/Screenshot_3.png )
+
+Можно изменить сообщение, которое показываетя в данном окне
+
+![](./Screenshots/Screenshot_4.png )
+
+![](./Screenshots/Screenshot_5.png )
