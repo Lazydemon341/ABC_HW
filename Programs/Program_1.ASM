@@ -10,7 +10,7 @@ include 'win64ax.inc' ; you can simply switch between win32ax, win32wx, win64ax 
         invoke  MessageBox,HWND_DESKTOP,"May I introduce myself?",invoke GetCommandLine,MB_YESNO
 
         .if eax = IDYES
-                invoke  MessageBox,HWND_DESKTOP,"Hi! I'm the example program!","Hello!",MB_OK
+                invoke  MessageBox,HWND_DESKTOP,"I love Software Engineering","Hello!",MB_OK
         .endif
 
         invoke  ExitProcess,0
