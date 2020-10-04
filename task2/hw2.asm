@@ -16,13 +16,12 @@ section '.data' data readable writable
         strVectorB   db 'Vector B:', 10, 0
         strVecElemOut  db '[%d] = %d', 10, 0
 
-        vec_size     dd 0
-        i            dd ?
+        vec_size     dd 0         ; Size of the vector A
+        i            dd ?         ; Loop iterations counter
         tmp          dd ?
         tmpStack     dd ?
-        vec          rd 100
-
-
+        vecA         rd 100
+        vecB         rd 100
 
 ;--------------------------------------------------------------------------
 section '.code' code readable executable
@@ -30,17 +29,25 @@ section '.code' code readable executable
         start:
         ; 1) vector A input
           call VectorInput
-        ; 2) get vector B
+
+        ; 2) write vector A
+          push strVectorA
+          call [printf]
+          call VectorOutA
+
+        ; 3) get vector B
           call VectorB
-        ; 3) out of VectorB
+
+        ; 4) write vector B
           push strVectorB
           call [printf]
-        ; 4) write vector B
-          call VectorOut
+          call VectorOutB
 
         finish:
+        ; Wait for user to press any key
           call [getch]
 
+        ; Exit the program
           push 0
           call [ExitProcess]
 
@@ -74,7 +81,7 @@ getVector:
         add esp, 4
 
         xor ecx, ecx            ; ecx = 0
-        mov ebx, vec            ; ebx = &vec
+        mov ebx, vecA            ; ebx = &vecA
 getVecLoop:
         mov [tmp], ebx
         cmp ecx, [vec_size]
@@ -102,63 +109,63 @@ endInputVector:
 ;--------------------------------------------------------------------------
 VectorB:
         xor ecx, ecx            ; ecx = 0
-        mov ebx, vec            ; ebx = &vec
+        mov ebx, vecB            ; ebx = &vecB
+        mov edx, vecA            ; edx = &vecA
+
 vecBLoop:
 
         cmp ecx, [vec_size]
         je endSumVector      ; to end of loop
 
-        ;mov eax, [sum]
-        ;add eax, [ebx]
-        ;mov [sum], eax
+        mov [i], ecx
 
         mov eax, 5
-        cmp [ebx], eax
+        cmp [edx], eax
         jg greaterThan5
 
         mov eax, -5
-        cmp eax, [ebx]
+        cmp eax, [edx]
         jg lessThanNeg5
 
         ;else:
-        mov edx, [ebx]
-        mov edx, 0
-        mov [ebx], edx
+        mov eax, 0
+        mov [ebx], eax
 
-        endIf:
+endIf:
 
+        mov ecx, [i]
         inc ecx
         add ebx, 4
+        add edx, 4
 
         jmp vecBLoop
 
 greaterThan5:
-        mov edx, [ebx]
-        mov eax, 5
-        add edx, eax
-        mov [ebx], edx
+        mov ecx, [edx]
+        add ecx, eax
+        mov [ebx], ecx
 
         jmp endIf
 
 lessThanNeg5:
-        mov edx, [ebx]
-        mov eax, 5
-        sub edx, eax
-        mov [ebx], edx
+        mov ecx, [edx]
+        add ecx, eax
+        mov [ebx], ecx
 
         jmp endIf
 
 endSumVector:
         ret
+
 ;--------------------------------------------------------------------------
-VectorOut:
+VectorOutA:
         mov [tmpStack], esp
         xor ecx, ecx            ; ecx = 0
-        mov ebx, vec            ; ebx = &vec
-putVecLoop:
+        mov ebx, vecA            ; ebx = &vecA
+putVecALoop:
         mov [tmp], ebx
         cmp ecx, [vec_size]
-        je endOutputVector      ; to end of loop
+        je endOutputVectorA      ; to end of loop
         mov [i], ecx
 
         ; output element
@@ -171,8 +178,36 @@ putVecLoop:
         inc ecx
         mov ebx, [tmp]
         add ebx, 4
-        jmp putVecLoop
-endOutputVector:
+        jmp putVecALoop
+
+endOutputVectorA:
+        mov esp, [tmpStack]
+        ret
+
+;--------------------------------------------------------------------------
+VectorOutB:
+        mov [tmpStack], esp
+        xor ecx, ecx            ; ecx = 0
+        mov ebx, vecB            ; ebx = &vecA
+putVecBLoop:
+        mov [tmp], ebx
+        cmp ecx, [vec_size]
+        je endOutputVectorB      ; to end of loop
+        mov [i], ecx
+
+        ; output element
+        push dword [ebx]
+        push ecx
+        push strVecElemOut
+        call [printf]
+
+        mov ecx, [i]
+        inc ecx
+        mov ebx, [tmp]
+        add ebx, 4
+        jmp putVecBLoop
+
+endOutputVectorB:
         mov esp, [tmpStack]
         ret
 
@@ -184,11 +219,9 @@ section '.idata' import data readable
 
 include 'api\user32.inc'
 include 'api\kernel32.inc'
+
     import kernel,\
-           ExitProcess, 'ExitProcess',\
-           HeapCreate,'HeapCreate',\
-           HeapAlloc,'HeapAlloc'
-  include 'api\kernel32.inc'
+           ExitProcess, 'ExitProcess'
     import msvcrt,\
            printf, 'printf',\
            scanf, 'scanf',\
