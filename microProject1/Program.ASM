@@ -8,7 +8,6 @@ section '.data' data readable writable
 
         strInputNum   db 'Input an unsigned dword: ', 0
         strUintFormat db '%u', 0
-        strNumFormat  db '%d', 0
         strIncorrectInput db 'The input is not a number!', 10, 0
         strPressAnyKey db 10, 'Press any key to exit...', 0
 
@@ -28,14 +27,10 @@ start:
         call [printf]
 
         push inputNum
-        push strNumFormat
+        push strUintFormat
         call [scanf]
 
         call CheckInput
-
-        push [inputNum]
-        push strNumFormat
-        call[printf]
 
         call FindCullenNumbersQuantityLoop
 
@@ -73,29 +68,37 @@ FindCullenNumbersQuantityLoop:
         mov [powerOfTwo], 1
         mov [counter], 0
 
+        mov ecx, 1
+
 continueLoop:
 
         ; Calculating C_n (Number of cullen)
-        mov ebx, [powerOfTwo]
         mov eax, [counter]
-        mul ebx   ; mul writes result to edx
+        mul [powerOfTwo]   ; mul writes result to eax and edx
+
+        ; If edx is not null then result of mull is greater than a dword
+        cmp edx, 0
+        jne endOfLoop
+
+        ; Else continue
         mov ebx, eax
         inc ebx
 
         ; Check if current Cullen number is not greater than inputNum
-        cmp ebx, inputNum
+        cmp ebx, [inputNum]
         jg endOfLoop
 
-        ; Else:
-        add [counter], 1    ; Increase counter
+        ; Else increase counter and continue
+        add [counter], 1
 
         mov eax, [two]
         mul [powerOfTwo]
         mov [powerOfTwo], eax   ; Calculate power of two
 
-        jmp continueLoop
+        inc ecx
 
 endOfLoop:
+        loop continueLoop
         ret
 
 
