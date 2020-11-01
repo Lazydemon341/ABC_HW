@@ -11,18 +11,18 @@ section '.data' data readable writable
         strIncorrectInput db 'The input is not a number!', 10, 0
         strPressAnyKey db 10, 'Press any key to exit...', 0
 
+        two             dd 2
+        powerOfTwo      dd 1 ; Power of two.
+        inputNum        dd ? ; Number that the user inputs.
+        counter         dd 0 ; Number of Cullen numbers that are not greater than inputNum.
 
         null = 0
-
-        inputNum        dd ? ; Number that the user inputs.
-        two             dd 2
-        powerOfTwo      dd ? ; Power of two.
-        counter         dd ? ; Number of Cullen numbers that are not greater than inputNum.
 
 ;--------------------------------------------------------------------------
 section '.code' code readable executable
 
 start:
+        ; Input
         push strInputNum
         call [printf]
 
@@ -30,15 +30,19 @@ start:
         push strUintFormat
         call [scanf]
 
+        ; Check for correct input
         call CheckInput
 
+        ; Calculate result
         call FindCullenNumbersQuantityLoop
 
+        ; Output
         push [counter]
         push strUintFormat
         call [printf]
 
 finish:
+        ; Wait for user to press a key
         push strPressAnyKey
         call [printf]
 
@@ -66,7 +70,7 @@ incorrectInput:
 
 FindCullenNumbersQuantityLoop:
         mov [powerOfTwo], 1
-        mov [counter], 0
+        mov [counter], null
 
         mov ecx, 1
 
@@ -77,7 +81,7 @@ continueLoop:
         mul [powerOfTwo]   ; mul writes result to eax and edx
 
         ; If edx is not null then result of mull is greater than a dword
-        cmp edx, 0
+        cmp edx, null
         jne endOfLoop
 
         ; Else continue
@@ -86,7 +90,7 @@ continueLoop:
 
         ; Check if current Cullen number is not greater than inputNum
         cmp ebx, [inputNum]
-        jg endOfLoop
+        ja endOfLoop
 
         ; Else increase counter and continue
         add [counter], 1
@@ -95,6 +99,7 @@ continueLoop:
         mul [powerOfTwo]
         mov [powerOfTwo], eax   ; Calculate power of two
 
+        ; So that the loop won't finish early
         inc ecx
 
 endOfLoop:
@@ -102,7 +107,7 @@ endOfLoop:
         ret
 
 
-;-------------------------------third act - including HeapApi--------------------------
+;-----------------------------------------------------------------------
                                                  
 section '.idata' import data readable
     library kernel, 'kernel32.dll',\
