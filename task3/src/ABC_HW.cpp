@@ -48,35 +48,57 @@ int getCramerDet(int* a1, int* a2, int* a3, int* a4) {
 
 int main()
 {
-    int** slae = new int* [4];
-	for (size_t i = 0; i < 4; i++)
+    int** slae = new int* [5]; 
+	for (size_t i = 0; i < 5; i++)
 	{
-		slae[i] = new int[5];
+		// Initialize the SLAE' columns
+		slae[i] = new int[4];
 	}
 
 	for (size_t i = 0; i < 4; i++)
 	{
 		printf("Enter the %d line of the system:\n", (i + 1));
-		scanf_s("%d %d %d %d %d", &slae[i][0], &slae[i][1], &slae[i][2], &slae[i][3], &slae[i][4]);
+		scanf_s("%d %d %d %d %d", &slae[0][i], &slae[1][i], &slae[2][i], &slae[3][i], &slae[4][i]);
 	}
 
-	printf("Entered SLAE:\n");
+	printf("\nEntered SLAE:\n");
 	for (size_t i = 0; i < 4; i++)
 	{
 		for (size_t j = 0; j < 5; j++)
 		{
-			printf("%d\t", slae[i][j]);
+			printf("%d\t", slae[j][i]);
 		}
 		printf("\n");
 	}
 
-	auto future =  async(getCramerDet, slae[0], slae[1], slae[2], slae[3]);
-	int d0 = future.get();
+	// Count the main delta
+	int d = getCramerDet(slae[0], slae[1], slae[2], slae[3]);
 	
-	if (d0 == 0) {
-		cout << "The d0 equals zero hence the Cramer's rule can't be applied!";
+	if (d == 0) {
+		cout << "\nDelta0 equals zero hence the Cramer's rule can't be applied!";
 	}
 	else {
-		cout << "\n" << "delta0 = " << d0;
+		cout << "\n" << "Delta0 = " << d << "\n";
+
+		// Count deltas 1-4
+		future<int>* farr = new future<int>[4];
+		farr[0] = async(launch::async, getCramerDet, slae[4], slae[1], slae[2], slae[3]);
+		farr[1] = async(launch::async, getCramerDet, slae[0], slae[4], slae[2], slae[3]);
+		farr[2] = async(launch::async, getCramerDet, slae[0], slae[1], slae[4], slae[3]);
+		farr[3] = async(launch::async, getCramerDet, slae[0], slae[1], slae[2], slae[4]);
+
+		int* delta = new int[5];
+		delta[0] = d;
+		for (size_t i = 1; i < 5; i++)
+		{
+			delta[i] = farr[i-1].get();
+			printf("Delta%d = %d\n", i, delta[i]);
+		}
+
+		cout << "\nSolutions:\n";
+		for (size_t i = 1; i < 5; i++)
+		{
+			printf("x%d = %.3f\n", i, delta[i] / (double)delta[0]);
+		}
 	}
 }
