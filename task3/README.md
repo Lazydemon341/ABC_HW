@@ -19,28 +19,28 @@
 ## Метод main
 В первую очередь - принимаем на ввод от пользователя коэффиценты системы и выводим их на экран.
 
-![](./Screenshots/Screenshot_1.png )
+![](./screenshots/Screenshot_1.png )
 
 Далее - считаем основной определитель системы с помощью метода getCramerDet, и если он равен 0, завершаем программу.
 
-![](./Screenshots/Screenshot_2.png )
+![](./screenshots/Screenshot_2.png )
 
 Иначе - вычисляем вспомогательные определители в разных потоках и выводим решения системы.
 
-![](./Screenshots/Screenshot_3.png )
+![](./screenshots/Screenshot_3.png )
 
 ## Метод printSLAE
 Выводит матрицу коэффицентов системы
 
-![](./Screenshots/Screenshot_4.png )
+![](./screenshots/Screenshot_4.png )
 
 ## Метод getCramerDet
 Составляет матрицу 4 на 4 из переданных столбцов системы и возвращает её определитель с помощью метода determinant
 
-![](./Screenshots/Screenshot_5.png )
+![](./screenshots/Screenshot_5.png )
 
 ## Метод determinant
 Вычисляет определитель квадратной матрицы с помощью рекурсии.
 
-![](./Screenshots/Screenshot_6.png )
+![](./screenshots/Screenshot_6.png )
 
