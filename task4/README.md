@@ -16,6 +16,11 @@
 
 Таким образом, многопоточность программы строится по модели "Управляющий и рабочие".
 
+## Источники:
+[Википедия: метод Крамера](https://ru.wikipedia.org/wiki/%D0%9C%D0%B5%D1%82%D0%BE%D0%B4_%D0%9A%D1%80%D0%B0%D0%BC%D0%B5%D1%80%D0%B0)
+[MS Docs: Директивы OpenMP](https://docs.microsoft.com/en-gb/cpp/parallel/openmp/reference/openmp-directives?view=msvc-160)
+[Методика разработки многопоточных приложений](https://rsdn.org/article/baseserv/RUThreadingMethodology.xml)
+
 ## Секция импорта
 
 ![](./screenshots/Screenshot_0.png )
