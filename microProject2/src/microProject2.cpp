@@ -19,7 +19,7 @@
 using namespace std;
 using namespace chrono;
 
-int N; // Number of read and write repetitions.
+unsigned N; // Number of read and write repetitions.
 vector<string> database;
 sem_t write_semaphore;
 vector<pthread_t> writers, readers;
@@ -42,10 +42,10 @@ void* writer(void* arg)
 	for (size_t i = 0; i < N; i++)
 	{
 		// Set seed depending on current time.
-		srand((unsigned)duration_cast<nanoseconds>(steady_clock::now().time_since_epoch()).count()); 
+		srand((unsigned)duration_cast<nanoseconds>(steady_clock::now().time_since_epoch()).count());
 		int index = rand() % database.size(); // Choose index of data cell.
 
-		printf("writer №%d is trying to change data cell №%d...\n", (int)arg, index + 1);
+		printf("writer №%d is trying to access the database...\n", (int)arg);
 		sem_wait(&write_semaphore); // Lock the database to other writers.
 
 		string prevValue = database[index];
@@ -53,15 +53,16 @@ void* writer(void* arg)
 		printf("writer №%d has changed data cell №%d from '%s' to '%s'\n", (int)arg, index + 1, prevValue.c_str(), database[index].c_str());
 		usleep(3);
 
+		printf("writer №%d has finished working with the data\n", (int)arg);
 		sem_post(&write_semaphore); // Release the database to other writers.
 	}
 	return 0;
 }
 
-int getUserInput(string msg, int* arg) {
+int getUserInput(string msg, unsigned* arg) {
 	printf("%s\n", msg.c_str());
 
-	if (scanf("%d", arg) != 1 || *arg < 1) {
+	if (scanf("%u", arg) != 1 || *arg < 1) {
 		printf("Incorrect input!");
 		return -1;
 	}
@@ -70,8 +71,8 @@ int getUserInput(string msg, int* arg) {
 
 int main()
 {
-	int numOfDataCells;
-	int numOfThreads;
+	unsigned numOfDataCells;
+	unsigned numOfThreads;
 
 	if (getUserInput("Input a number of data cells:", &numOfDataCells) != 0 ||
 		getUserInput("Input a number of readers and writers:", &numOfThreads) != 0 ||
@@ -84,7 +85,7 @@ int main()
 	for (size_t i = 0; i < database.size(); i++)
 	{
 		// Initialize the data.
-		database[i] = "data" + to_string(i);
+		database[i] = "data" + to_string(i + 1);
 	}
 
 	sem_init(&write_semaphore, 0, 1);
